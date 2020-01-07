@@ -37,7 +37,6 @@ class ThreadRanker(object):
         k = 10
         n = int(len(thread_ids) / k)
         for i in range(k):
-            print(i)
             if i == k - 1:
                 break # Due to memory error (AWS 1GB Free Tier) we do not include the last chunk of threads
                 # best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
