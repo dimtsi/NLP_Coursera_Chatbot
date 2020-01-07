@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from sklearn.metrics.pairwise import pairwise_distances_argmin_min
 
 from chatterbot import ChatBot
@@ -30,21 +31,22 @@ class ThreadRanker(object):
         question_vec = question_to_vec(question, self.word_embeddings, dim=self.embeddings_dim)
         #### YOUR CODE HERE ####
         # best_thread = pairwise_distances_argmin(question_vec.reshape(1, -1), thread_embeddings, metric='cosine')[0]
-        n = int(len(thread_ids) / 2)
+        scores_list = []
+        k = 10
+        n = int(len(thread_ids) / k)
+        for i in range(k):
+            if i == k - 1:
+                best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
+                                                                  thread_embeddings[i * n:, :], metric='cosine')
+            else:
+                best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
+                                                                  thread_embeddings[i * n:(i + 1) * n, :],
+                                                                  metric='cosine')
 
-        best_thread1, dist1 = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
-                                                            thread_embeddings[:n, :], metric='cosine')
+            scores_list.append({'thread': i * n + best_thread[0], 'dist': dist[0]})
 
-        best_thread2, dist2 = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
-                                                            thread_embeddings[n:, :], metric='cosine')
-
-        if dist1[0] <= dist2[0]:
-            best_thread = best_thread1[0]
-        else:
-            best_thread = best_thread2[0] + n
-
-
-
+        df = pd.DataFrame(scores_list).sort_values(by='dist')
+        best_thread = int(df.iloc[0]['thread'])
         return thread_ids[best_thread]
 
 # class DialogueManager(object):
