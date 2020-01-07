@@ -37,8 +37,9 @@ class ThreadRanker(object):
         for i in range(k):
             print(i)
             if i == k - 1:
-                best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
-                                                                  thread_embeddings[i * n:, :], metric='cosine')
+                break
+                # best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
+                #                                                   thread_embeddings[i * n:, :], metric='cosine')
             else:
                 best_thread, dist = pairwise_distances_argmin_min(question_vec.reshape((1, self.embeddings_dim)),
                                                                   thread_embeddings[i * n:(i + 1) * n, :],
